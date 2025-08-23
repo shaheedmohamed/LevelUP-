@@ -1,58 +1,47 @@
 <template>
-  <div class="d-flex">
-    <AdminSidebar :open="sidebarOpen" />
-    <div class="flex-grow-1" :style="{ marginLeft: '260px' }">
-      <AdminNavbar @toggleSidebar="sidebarOpen = !sidebarOpen" />
-      <main class="container-fluid py-4">
-        <div class="card shadow-sm border-0">
-          <div class="card-header bg-white fw-bold">
-            <i class="fa-solid fa-clipboard-list me-2"></i>Login Logs (last 50)
-          </div>
-          <div class="table-responsive">
-            <table class="table align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>#</th>
-                  <th>Email</th>
-                  <th>User</th>
-                  <th>Result</th>
-                  <th>IP</th>
-                  <th>User Agent</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="l in items" :key="l.id">
-                  <td>{{ l.id }}</td>
-                  <td>{{ l.email || '—' }}</td>
-                  <td>{{ l.name || '—' }}</td>
-                  <td>
-                    <span class="badge" :class="l.success ? 'bg-success' : 'bg-danger'">{{ l.success ? 'Success' : 'Fail' }}</span>
-                  </td>
-                  <td>{{ l.ip || '—' }}</td>
-                  <td class="text-truncate" style="max-width: 320px;" :title="l.user_agent">{{ l.user_agent }}</td>
-                  <td>{{ new Date(l.created_at).toLocaleString() }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+  <section class="container py-5">
+    <h1 class="h3 mb-3">Admin Logs</h1>
+    <p class="text-muted mb-3">Latest application events.</p>
+
+    <div v-if="loading" class="alert alert-info py-2">Loading logs…</div>
+    <div v-else-if="error" class="alert alert-danger py-2">{{ error }}</div>
+
+    <ul v-else class="list-group">
+      <li v-for="log in logs" :key="log.id" class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <span :class="['badge me-2', levelClass(log.level)]">{{ log.level }}</span>
+          <span>{{ log.message }}</span>
         </div>
-      </main>
-    </div>
-  </div>
+        <small class="text-muted">{{ new Date(log.time).toLocaleString() }}</small>
+      </li>
+    </ul>
+  </section>
 </template>
 
 <script>
 import axios from 'axios'
-import AdminNavbar from '../../layouts/AdminNavbar.vue'
-import AdminSidebar from '../../layouts/AdminSidebar.vue'
+
 export default {
   name: 'AdminLogsPage',
-  components: { AdminNavbar, AdminSidebar },
-  data(){ return { sidebarOpen:true, items:[] } },
-  async created(){
-    const { data } = await axios.get('/api/admin/logs')
-    this.items = data
+  data() {
+    return { logs: [], loading: true, error: null }
+  },
+  methods: {
+    levelClass(level) {
+      if (level === 'error') return 'bg-danger'
+      if (level === 'warning') return 'bg-warning text-dark'
+      return 'bg-secondary'
+    }
+  },
+  async mounted() {
+    try {
+      const { data } = await axios.get('/api/admin/logs')
+      this.logs = data
+    } catch (e) {
+      this.error = e?.response?.data?.message || e.message || 'Failed to load logs'
+    } finally {
+      this.loading = false
+    }
   }
 }
 </script>

@@ -1,6 +1,5 @@
 <template>
   <div class="py-5">
-    <Navbar />
     <section class="container" v-reveal>
       <div class="text-center mb-4">
         <h1 class="fw-bold">Dashboard</h1>
@@ -82,7 +81,6 @@
 </template>
 
 <script>
-import Navbar from '../layouts/Navbar.vue'
 import Footer from '../layouts/Footer.vue'
-export default { name:'DashboardPage', components:{ Navbar, Footer } }
+export default { name:'DashboardPage', components:{ Footer } }
 </script>

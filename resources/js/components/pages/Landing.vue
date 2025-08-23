@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Navbar />
     <section id="top" class="hero-animated-bg py-5 py-lg-6 position-relative">
       <div class="container py-5">
         <div class="row align-items-center gy-4">
@@ -10,8 +9,8 @@
             <h1 class="display-5 fw-bold text-gradient">AI that teaches you your way</h1>
             <p class="lead text-muted mt-3">Personalized lessons, an always-on AI tutor, and smart reminders.</p>
             <div class="d-flex gap-3 mt-4">
-              <RouterLink :to="{ name: 'register' }" class="btn btn-primary btn-lg px-4 btn-shine">
-                <i class="fa-solid fa-user-plus me-2"></i>Sign Up
+              <RouterLink :to="primaryCta.to" class="btn btn-primary btn-lg px-4 btn-shine">
+                <i class="fa-solid fa-user-plus me-2"></i>{{ primaryCta.label }}
               </RouterLink>
               <RouterLink :to="{ name: 'features' }" class="btn btn-outline-primary btn-lg px-4">
                 <i class="fa-solid fa-circle-play me-2"></i>Learn More
@@ -20,7 +19,7 @@
           </div>
           <div class="col-lg-6" v-reveal>
             <div class="ratio ratio-16x9 rounded-4 shadow overflow-hidden bg-white" data-parallax data-speed="0.15">
-              <img src="/images/hero2.jpg" alt="Smart Path Hero" class="w-100 h-100" style="object-fit: cover;" />
+              <img src="/images/hero2.jpg" alt="Smart Path Hero" class="w-100 h-100 animate-float" style="object-fit: cover;" />
             </div>
           </div>
         </div>
@@ -88,16 +87,41 @@
       </div>
     </section>
 
+    <!-- Extra section: Subjects grid based on education stage (visible when logged in) -->
+    <section v-if="isLoggedIn && subjects.length" class="py-5">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4" v-reveal>
+          <h2 class="fw-bold mb-0">Subjects for {{ stage }}</h2>
+          <small class="text-muted">Choose a subject to start learning</small>
+        </div>
+        <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3">
+          <div class="col" v-for="(sub, idx) in subjects" :key="idx" v-reveal>
+            <RouterLink :to="{ name: 'subject', params: { subject: sub.slug } }" class="text-decoration-none">
+              <div class="card border-0 shadow-sm h-100 card-hover">
+                <div class="card-body p-4 d-flex align-items-center gap-3">
+                  <div class="display-6 text-primary"><i :class="sub.icon"></i></div>
+                  <div>
+                    <h5 class="fw-semibold mb-1">{{ sub.name }}</h5>
+                    <p class="text-muted small mb-0">Click to view {{ sub.name }} lessons</p>
+                  </div>
+                </div>
+              </div>
+            </RouterLink>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <Footer />
   </div>
 </template>
 
 <script>
-import Navbar from '../layouts/Navbar.vue'
 import Footer from '../layouts/Footer.vue'
+import auth from '../../store/auth'
 export default {
   name: 'LandingPage',
-  components: { Navbar, Footer },
+  components: { Footer },
   data(){
     return {
       features: [
@@ -113,6 +137,41 @@ export default {
         { icon:'fa-solid fa-calendar-check', title:'Reminders', text:'Plan to succeed.' },
         { icon:'fa-solid fa-graduation-cap', title:'Lessons', text:'Daily micro-learning.' },
       ]
+    }
+  },
+  computed: {
+    isLoggedIn(){ return auth.isAuthenticated() },
+    stage(){ return auth.state.user?.education_stage || '' },
+    primaryCta(){
+      return this.isLoggedIn
+        ? { to: { name:'subjects' }, label: 'Browse Subjects' }
+        : { to: { name:'register' }, label: 'Sign Up' }
+    },
+    subjects(){
+      const map = {
+        Primary: [
+          { name: 'Math', slug: 'math', icon: 'fa-solid fa-square-root-variable' },
+          { name: 'Arabic', slug: 'arabic', icon: 'fa-solid fa-language' },
+          { name: 'Science', slug: 'science', icon: 'fa-solid fa-flask' },
+          { name: 'English', slug: 'english', icon: 'fa-solid fa-book' },
+        ],
+        Preparatory: [
+          { name: 'Math', slug: 'math', icon: 'fa-solid fa-square-root-variable' },
+          { name: 'Science', slug: 'science', icon: 'fa-solid fa-flask' },
+          { name: 'History', slug: 'history', icon: 'fa-solid fa-landmark' },
+          { name: 'English', slug: 'english', icon: 'fa-solid fa-book' },
+          { name: 'Arabic', slug: 'arabic', icon: 'fa-solid fa-language' },
+        ],
+        Secondary: [
+          { name: 'Math', slug: 'math', icon: 'fa-solid fa-square-root-variable' },
+          { name: 'Physics', slug: 'physics', icon: 'fa-solid fa-atom' },
+          { name: 'Chemistry', slug: 'chemistry', icon: 'fa-solid fa-vial' },
+          { name: 'Biology', slug: 'biology', icon: 'fa-solid fa-dna' },
+          { name: 'Arabic', slug: 'arabic', icon: 'fa-solid fa-language' },
+          { name: 'English', slug: 'english', icon: 'fa-solid fa-book' },
+        ],
+      }
+      return map[this.stage] || []
     }
   }
 }

@@ -14,7 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Register route middleware aliases
         $middleware->alias([
-            'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+            'isAdmin' => App\Http\Middleware\IsAdmin::class,
+        ]);
+
+        // Track visits for both web and api requests
+        $middleware->group('web', [
+            App\Http\Middleware\TrackVisit::class,
+        ]);
+        $middleware->group('api', [
+            App\Http\Middleware\TrackVisit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

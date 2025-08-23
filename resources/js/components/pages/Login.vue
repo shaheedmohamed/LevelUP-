@@ -1,6 +1,5 @@
 <template>
   <div class="py-5">
-    <Navbar />
     <section id="login" class="container" v-reveal>
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
@@ -34,13 +33,12 @@
 </template>
 
 <script>
-import Navbar from '../layouts/Navbar.vue'
 import Footer from '../layouts/Footer.vue'
 import axios from 'axios'
 import auth from '../../store/auth'
 export default {
   name: 'LoginPage',
-  components: { Navbar, Footer },
+  components: { Footer },
   data(){ return { email:'', password:'', loading:false, error:'', success:'' } },
   methods:{
     async submit(){
@@ -50,12 +48,8 @@ export default {
         auth.setToken(data.token)
         auth.setUser(data.user)
         this.success = 'Logged in successfully'
-        // Role-based redirect
-        const role = data?.user?.role
-        let redirect = this.$route.query.redirect
-        if(!redirect){
-          redirect = role === 'admin' ? { name:'admin-dashboard' } : { name:'dashboard' }
-        }
+        // Redirect to dashboard
+        const redirect = this.$route.query.redirect || { name:'dashboard' }
         setTimeout(()=> this.$router.push(redirect), 300)
       }catch(err){
         this.error = err?.response?.data?.message || err?.response?.data?.errors?.email?.[0] || 'Login failed'

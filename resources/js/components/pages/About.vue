@@ -1,6 +1,5 @@
 <template>
   <div class="py-5">
-    <Navbar />
     <section class="container">
       <div class="row justify-content-center mb-4">
         <div class="col-lg-10">
@@ -47,11 +46,10 @@
 </template>
 
 <script>
-import Navbar from '../layouts/Navbar.vue'
 import Footer from '../layouts/Footer.vue'
 export default {
   name: 'AboutPage',
-  components: { Navbar, Footer },
+  components: { Footer },
   data(){
     return {
       timeline: [

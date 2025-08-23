@@ -1,6 +1,5 @@
 <template>
   <div class="py-5">
-    <Navbar />
     <section class="container">
       <div class="text-center mb-5" v-reveal>
         <h1 class="fw-bold">Features</h1>
@@ -46,11 +45,10 @@
 </template>
 
 <script>
-import Navbar from '../layouts/Navbar.vue'
 import Footer from '../layouts/Footer.vue'
 export default {
   name: 'FeaturesPage',
-  components: { Navbar, Footer },
+  components: { Footer },
   data(){
     return {
       features: [

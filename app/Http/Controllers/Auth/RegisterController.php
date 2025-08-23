@@ -17,6 +17,8 @@ class RegisterController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string'],
+            'age' => ['required', 'integer', 'min:5', 'max:100'],
+            'education_stage' => ['required', 'in:Primary,Preparatory,Secondary'],
         ]);
 
         $user = User::create([
@@ -24,6 +26,8 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
+            'age' => $data['age'],
+            'education_stage' => $data['education_stage'],
         ]);
 
         $token = $user->createToken('api')->plainTextToken;

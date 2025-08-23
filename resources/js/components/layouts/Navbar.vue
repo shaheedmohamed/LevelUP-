@@ -1,55 +1,177 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-transparent border-0 sticky-top shadow-sm nav-glass" v-reveal>
-    <div class="container">
-      <RouterLink class="navbar-brand d-flex align-items-center fw-bold text-decoration-none" :to="{ name: 'home' }">
-        <img src="/images/logo-smartpath.png" alt="Smart Path Logo" class="me-2 brand-logo" />
-        <span>Smart Path</span>
-      </RouterLink>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
-          <li class="nav-item"><RouterLink class="nav-link" :to="{ name: 'home' }"><i class="fa-solid fa-house me-1 d-lg-none"></i>Home</RouterLink></li>
-          <li class="nav-item"><RouterLink class="nav-link" :to="{ name: 'features' }"><i class="fa-solid fa-table-cells-large me-1 d-lg-none"></i>Features</RouterLink></li>
-          <li class="nav-item"><RouterLink class="nav-link" :to="{ name: 'about' }"><i class="fa-solid fa-lightbulb me-1 d-lg-none"></i>About</RouterLink></li>
-          <li class="nav-item"><RouterLink class="nav-link" :to="{ name: 'contact' }"><i class="fa-solid fa-envelope me-1 d-lg-none"></i>Contact</RouterLink></li>
-          <template v-if="!isAuthed">
-            <li class="nav-item"><RouterLink class="nav-link" :to="{ name: 'login' }"><i class="fa-solid fa-right-to-bracket me-1 d-lg-none"></i>Login</RouterLink></li>
-            <li class="nav-item"><RouterLink class="btn btn-sm btn-primary ms-lg-3" :to="{ name: 'register' }"><i class="fa-solid fa-user-plus me-1"></i>Register</RouterLink></li>
-          </template>
-          <template v-else>
-            <li class="nav-item" v-if="isAdmin"><RouterLink class="btn btn-sm btn-warning ms-lg-3" :to="{ name: 'admin-dashboard' }"><i class="fa-solid fa-shield-halved me-1"></i>Admin</RouterLink></li>
-            <li class="nav-item"><RouterLink class="btn btn-sm btn-outline-primary ms-lg-3" :to="{ name: 'dashboard' }"><i class="fa-solid fa-gauge-high me-1"></i>Dashboard</RouterLink></li>
-            <li class="nav-item dropdown ms-lg-2">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fa-regular fa-user me-1"></i>{{ userName }}
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><button class="dropdown-item" @click="doLogout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button></li>
-              </ul>
+  <transition name="fade-slide">
+    <nav
+      class="sp-navbar sticky-top"
+      :class="{ 'scrolled': isScrolled }"
+      role="navigation"
+      aria-label="Main"
+    >
+      <div class="container d-flex align-items-center justify-content-between">
+        <!-- Brand -->
+        <RouterLink class="brand d-flex align-items-center text-decoration-none" :to="{ name: 'home' }" @click="closeMenu">
+          <img src="/images/logo-smartpath.png" alt="Smart Path Logo" class="brand-logo me-2" />
+          <span class="fw-bold">Smart Path</span>
+        </RouterLink>
+
+        <!-- Toggler -->
+        <button class="menu-btn d-lg-none" :aria-expanded="isOpen ? 'true' : 'false'" @click="toggleMenu" aria-label="Toggle Menu">
+          <span :class="{ open: isOpen }"></span>
+          <span :class="{ open: isOpen }"></span>
+          <span :class="{ open: isOpen }"></span>
+        </button>
+
+        <!-- Links -->
+        <div class="links-wrapper" :class="{ open: isOpen }">
+          <ul class="nav-list">
+            <li><RouterLink class="nav-link" :to="{ name: 'home' }" @click="closeMenu">Home</RouterLink></li>
+            <li><RouterLink class="nav-link" :to="{ name: 'features' }" @click="closeMenu">Features</RouterLink></li>
+            <li><RouterLink class="nav-link" :to="{ name: 'about' }" @click="closeMenu">About</RouterLink></li>
+            <li><RouterLink class="nav-link" :to="{ name: 'contact' }" @click="closeMenu">Contact</RouterLink></li>
+            <li>
+              <RouterLink class="nav-link admin-link" :to="{ name: 'admin-dashboard' }" @click="closeMenu">
+                <i class="fa-solid fa-user-shield me-2"></i>
+                Admin
+              </RouterLink>
             </li>
-          </template>
-        </ul>
+          </ul>
+
+          <div class="auth-area">
+            <template v-if="!isAuthed">
+              <RouterLink class="btn btn-outline-primary me-2" :to="{ name: 'login' }" @click="closeMenu">Login</RouterLink>
+              <RouterLink class="btn btn-primary" :to="{ name: 'register' }" @click="closeMenu">Register</RouterLink>
+            </template>
+            <template v-else>
+              <RouterLink class="btn btn-outline-primary me-2" :to="{ name: 'dashboard' }" @click="closeMenu">
+                <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+              </RouterLink>
+              <div class="dropdown" @mouseleave="dropdown=false">
+                <button class="btn btn-light d-flex align-items-center" @mouseenter="dropdown=true" @click="dropdown = !dropdown">
+                  <i class="fa-regular fa-user me-2"></i>{{ userName }}
+                  <i class="fa-solid fa-chevron-down ms-2 small"></i>
+                </button>
+                <div class="dropdown-menu end" v-if="dropdown">
+                  <RouterLink class="dropdown-item" :to="{ name: 'profile' }" @click="closeMenu"><i class="fa-regular fa-id-badge me-2"></i>Profile</RouterLink>
+                  <button class="dropdown-item" @click="handleLogout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
       </div>
-    </div>
-  </nav>
+      <!-- subtle top glow -->
+      <div class="top-glow"></div>
+    </nav>
+  </transition>
 </template>
 
 <script>
+import { onMounted, onBeforeUnmount, ref, computed } from 'vue'
 import auth from '../../store/auth'
+
 export default {
   name: 'NavbarLayout',
-  computed:{
-    isAuthed(){ return auth.isAuthenticated() },
-    userName(){ return auth.state.user?.name || 'Account' },
-    isAdmin(){ return auth.state.user?.role === 'admin' }
-  },
-  methods:{
-    async doLogout(){
+  setup(_, { emit, expose }){
+    const isOpen = ref(false)
+    const dropdown = ref(false)
+    const isScrolled = ref(false)
+
+    const isAuthed = computed(() => auth.isAuthenticated())
+    const userName = computed(() => auth.state.user?.name || 'Account')
+
+    const toggleMenu = () => { isOpen.value = !isOpen.value }
+    const closeMenu = () => { isOpen.value = false; dropdown.value = false }
+    const onScroll = () => { isScrolled.value = window.scrollY > 16 }
+
+    const handleLogout = async () => {
       await auth.logout()
-      this.$router.push({ name:'home' })
+      closeMenu()
+      window.location.href = '/'
     }
+
+    onMounted(() => {
+      onScroll()
+      window.addEventListener('scroll', onScroll, { passive: true })
+    })
+    onBeforeUnmount(() => {
+      window.removeEventListener('scroll', onScroll)
+    })
+
+    return { isOpen, dropdown, isScrolled, isAuthed, userName, toggleMenu, closeMenu, handleLogout }
   }
 }
 </script>
+
+<style scoped>
+/* Container and glass effect */
+.sp-navbar {
+  --bg: rgba(255, 255, 255, 0.3);
+  --bd: rgba(255, 255, 255, 0.35);
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background: var(--bg);
+  backdrop-filter: saturate(160%) blur(16px);
+  -webkit-backdrop-filter: saturate(160%) blur(16px);
+  border-bottom: 1px solid var(--bd);
+  box-shadow: var(--shadow);
+  padding: 14px 0; /* increase height */
+}
+.sp-navbar.scrolled {
+  --bg: rgba(255, 255, 255, 0.7);
+}
+
+.brand-logo { height: 32px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,.1)); }
+.brand { color: #0f172a; }
+
+/* Links area */
+.links-wrapper {
+  display: flex;
+  align-items: center;
+}
+.nav-list { list-style: none; display: flex; gap: 1rem; margin: 0; padding: 0; }
+.nav-link { position: relative; color: #334155; text-decoration: none; padding: .5rem .25rem; font-size: 1.05rem; }
+.nav-link::after {
+  content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 0; background: linear-gradient(90deg, #6366f1, #06b6d4);
+  transition: width .25s ease;
+}
+.nav-link:hover::after, .router-link-active.nav-link::after { width: 100%; }
+.admin-link::after {
+  background: linear-gradient(90deg, #ffff00, #ffff00);
+}
+
+/* Auth area */
+.auth-area { display: flex; align-items: center; gap: .75rem; margin-left: 1.25rem; }
+.dropdown { position: relative; }
+.dropdown-menu {
+  position: absolute; min-width: 160px; right: 0; top: calc(100% + 6px);
+  background: #fff; border: 1px solid rgba(0,0,0,.06); border-radius: .75rem; box-shadow: 0 10px 30px rgba(2,6,23,.12);
+  padding: .5rem; z-index: 10;
+}
+.dropdown-item { width: 100%; background: transparent; border: 0; text-align: left; padding: .5rem .75rem; border-radius: .5rem; color: #0f172a; }
+.dropdown-item:hover { background: rgba(99,102,241,.08); }
+
+/* Mobile menu */
+.menu-btn { background: transparent; border: 0; width: 40px; height: 32px; position: relative; display: grid; place-items: center; }
+.menu-btn span { display: block; width: 24px; height: 2px; background: #0f172a; transition: transform .25s ease, opacity .25s ease; }
+.menu-btn span + span { margin-top: 5px; }
+.menu-btn span.open:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-btn span.open:nth-child(2) { opacity: 0; }
+.menu-btn span.open:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile behavior */
+@media (max-width: 991.98px) {
+  .links-wrapper { position: fixed; inset: 64px 0 0 0; background: rgba(255,255,255,.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transform: translateY(-8px); opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; display: block; }
+  .links-wrapper.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .nav-list { flex-direction: column; gap: .25rem; padding: 1rem; }
+  .auth-area { padding: 0 1rem 1rem; margin-left: 0; }
+}
+
+/* Mount animation */
+.fade-slide-enter-from { opacity: 0; transform: translateY(-10px); }
+.fade-slide-enter-active { transition: all .35s ease; }
+.fade-slide-enter-to { opacity: 1; transform: translateY(0); }
+
+/* Subtle glow line */
+.top-glow { position: absolute; inset: 0 0 auto 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,.35), rgba(6,182,212,.35), transparent); opacity: .8; }
+</style>

@@ -1,6 +1,5 @@
 <template>
   <div class="py-5">
-    <Navbar />
     <section id="register" class="container" v-reveal>
       <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
@@ -21,6 +20,19 @@
                 <div class="mb-3">
                   <label class="form-label">Phone (optional)</label>
                   <input v-model="form.phone" type="text" class="form-control form-control-lg" placeholder="(+20) 1X XXX XXXX">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Age</label>
+                  <input v-model.number="form.age" type="number" min="5" max="100" class="form-control form-control-lg" placeholder="Your age" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Education Stage</label>
+                  <select v-model="form.education_stage" class="form-select form-select-lg" required>
+                    <option value="" disabled>Select your stage</option>
+                    <option value="Primary">Primary</option>
+                    <option value="Preparatory">Preparatory</option>
+                    <option value="Secondary">Secondary</option>
+                  </select>
                 </div>
                 <div class="mb-3">
                   <label class="form-label">Password</label>
@@ -46,15 +58,14 @@
 </template>
 
 <script>
-import Navbar from '../layouts/Navbar.vue'
 import Footer from '../layouts/Footer.vue'
 import axios from 'axios'
 import auth from '../../store/auth'
 export default {
   name: 'RegisterPage',
-  components: { Navbar, Footer },
+  components: { Footer },
   data(){
-    return { form: { name:'', email:'', phone:'', password:'', password_confirmation:'' }, loading:false, error:'', success:'' }
+    return { form: { name:'', email:'', phone:'', age:null, education_stage:'', password:'', password_confirmation:'' }, loading:false, error:'', success:'' }
   },
   methods:{
     async submit(){
@@ -66,9 +77,7 @@ export default {
         auth.setToken(data.token)
         auth.setUser(data.user)
         this.success = 'Account created successfully'
-        const role = data?.user?.role
-        const target = role === 'admin' ? { name:'admin-dashboard' } : { name:'dashboard' }
-        setTimeout(()=> this.$router.push(target), 400)
+        setTimeout(()=> this.$router.push({ name:'dashboard' }), 400)
       }catch(err){
         this.error = err?.response?.data?.message
           || Object.values(err?.response?.data?.errors || {})[0]?.[0]

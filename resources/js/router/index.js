@@ -11,9 +11,16 @@ import LoginPage from '../components/pages/Login.vue'
 import RegisterPage from '../components/pages/Register.vue'
 import DashboardPage from '../components/pages/Dashboard.vue'
 import AdminDashboard from '../components/pages/admin/Dashboard.vue'
+import AdminLayout from '../components/layouts/AdminLayout.vue'
 import AdminUsers from '../components/pages/admin/Users.vue'
 import AdminLogs from '../components/pages/admin/Logs.vue'
 import AdminSettings from '../components/pages/admin/Settings.vue'
+import SubjectPage from '../components/pages/Subject.vue'
+import AdminSubjects from '../components/pages/admin/Subjects.vue'
+import AdminBooks from '../components/pages/admin/Books.vue'
+import ProfilePage from '../components/pages/Profile.vue'
+import AdminUserProfile from '../components/pages/admin/UserProfile.vue'
+import SubjectsPage from '../components/pages/Subjects.vue'
 
 export const routes = [
   { path: '/', name: 'home', component: LandingPage },
@@ -23,17 +30,25 @@ export const routes = [
   { path: '/login', name: 'login', component: LoginPage, meta: { guestOnly: true } },
   { path: '/register', name: 'register', component: RegisterPage, meta: { guestOnly: true } },
   { path: '/dashboard', name: 'dashboard', component: DashboardPage, meta: { requiresAuth: true } },
+  { path: '/profile', name: 'profile', component: ProfilePage, meta: { requiresAuth: true } },
+  { path: '/subjects', name: 'subjects', component: SubjectsPage },
+  { path: '/subjects/:subject', name: 'subject', component: SubjectPage, props: true },
+  // Admin area under shared layout
   {
     path: '/admin',
-    component: { render: () => h('router-view') },
-    meta: { requiresAuth: true, requiresAdmin: true },
+    component: AdminLayout,
+    meta: { requiresAuth: true, requiresAdmin: true, admin: true },
     children: [
       { path: 'dashboard', name: 'admin-dashboard', component: AdminDashboard },
       { path: 'users', name: 'admin-users', component: AdminUsers },
+      { path: 'users/:id/profile', name: 'admin-user-profile', component: AdminUserProfile, props: true },
       { path: 'logs', name: 'admin-logs', component: AdminLogs },
       { path: 'settings', name: 'admin-settings', component: AdminSettings },
+      { path: 'subjects', name: 'admin-subjects', component: AdminSubjects },
+      { path: 'books', name: 'admin-books', component: AdminBooks },
     ]
   },
+  { path: '/:pathMatch(.*)*', redirect: { name: 'home' } },
 ]
 
 const router = createRouter({
@@ -45,19 +60,25 @@ const router = createRouter({
 // Load state from storage when router initializes
 auth.loadFromLocalStorage()
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   if (to.meta?.requiresAuth && !auth.isAuthenticated()) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
-  // Enforce admin-only routes
-  if (to.meta?.requiresAdmin) {
-    const role = auth.state.user?.role
-    if (role !== 'admin') return { name: 'dashboard' }
-  }
   // Guests cannot access login/register; redirect based on role
   if (to.meta?.guestOnly && auth.isAuthenticated()) {
+    return { name: 'dashboard' }
+  }
+
+  // Admin role guard
+  if (to.meta?.requiresAdmin) {
+    // Ensure we have the latest user profile
+    if (!auth.state.user && auth.isAuthenticated()) {
+      await auth.fetchUser()
+    }
     const role = auth.state.user?.role
-    return role === 'admin' ? { name: 'admin-dashboard' } : { name: 'dashboard' }
+    if (role !== 'admin') {
+      return { name: 'dashboard', query: { noadmin: '1' } }
+    }
   }
 })
 

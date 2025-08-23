@@ -6,6 +6,7 @@
 
 import './bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../css/tailwind.css';
 import '../css/animations.css';
 import './assets/css/custom.css';
 import { createApp } from 'vue';
