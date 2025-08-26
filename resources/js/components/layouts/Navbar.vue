@@ -27,7 +27,7 @@
             <li><RouterLink class="nav-link" :to="{ name: 'features' }" @click="closeMenu">Features</RouterLink></li>
             <li><RouterLink class="nav-link" :to="{ name: 'about' }" @click="closeMenu">About</RouterLink></li>
             <li><RouterLink class="nav-link" :to="{ name: 'contact' }" @click="closeMenu">Contact</RouterLink></li>
-            <li>
+            <li v-if="isAdminUser">
               <RouterLink class="nav-link admin-link" :to="{ name: 'admin-dashboard' }" @click="closeMenu">
                 <i class="fa-solid fa-user-shield me-2"></i>
                 Admin
@@ -44,13 +44,14 @@
               <RouterLink class="btn btn-outline-primary me-2" :to="{ name: 'dashboard' }" @click="closeMenu">
                 <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
               </RouterLink>
-              <div class="dropdown" @mouseleave="dropdown=false">
-                <button class="btn btn-light d-flex align-items-center" @mouseenter="dropdown=true" @click="dropdown = !dropdown">
+              <div class="dropdown" ref="dropdownWrap">
+                <button class="btn btn-light d-flex align-items-center" @click="toggleDropdown" :aria-expanded="dropdown ? 'true' : 'false'" aria-haspopup="menu">
                   <i class="fa-regular fa-user me-2"></i>{{ userName }}
                   <i class="fa-solid fa-chevron-down ms-2 small"></i>
                 </button>
-                <div class="dropdown-menu end" v-if="dropdown">
+                <div class="dropdown-menu end" v-if="dropdown" role="menu">
                   <RouterLink class="dropdown-item" :to="{ name: 'profile' }" @click="closeMenu"><i class="fa-regular fa-id-badge me-2"></i>Profile</RouterLink>
+                  <RouterLink class="dropdown-item" :to="{ name: 'advisor' }" @click="closeMenu"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Create plan with Shaheed</RouterLink>
                   <button class="dropdown-item" @click="handleLogout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button>
                 </div>
               </div>
@@ -73,10 +74,15 @@ export default {
   setup(_, { emit, expose }){
     const isOpen = ref(false)
     const dropdown = ref(false)
+    const dropdownWrap = ref(null)
     const isScrolled = ref(false)
 
     const isAuthed = computed(() => auth.isAuthenticated())
     const userName = computed(() => auth.state.user?.name || 'Account')
+    const isAdminUser = computed(() => {
+      const u = auth.state.user || {}
+      return !!(u.is_admin || u.isAdmin || u.role === 'admin' || u.role === 'superadmin')
+    })
 
     const toggleMenu = () => { isOpen.value = !isOpen.value }
     const closeMenu = () => { isOpen.value = false; dropdown.value = false }
@@ -88,15 +94,24 @@ export default {
       window.location.href = '/'
     }
 
+    const toggleDropdown = () => { dropdown.value = !dropdown.value }
+    const onClickOutside = (e) => {
+      if (!dropdown.value) return
+      const el = dropdownWrap.value
+      if (el && !el.contains(e.target)) dropdown.value = false
+    }
+
     onMounted(() => {
       onScroll()
       window.addEventListener('scroll', onScroll, { passive: true })
+      document.addEventListener('click', onClickOutside, { passive: true })
     })
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('click', onClickOutside)
     })
 
-    return { isOpen, dropdown, isScrolled, isAuthed, userName, toggleMenu, closeMenu, handleLogout }
+    return { isOpen, dropdown, isScrolled, isAuthed, userName, isAdminUser, toggleMenu, closeMenu, handleLogout, toggleDropdown, dropdownWrap }
   }
 }
 </script>

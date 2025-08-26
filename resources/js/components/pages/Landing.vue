@@ -50,6 +50,8 @@
       </div>
     </section>
 
+    
+
     <section id="features" class="py-5">
       <div class="container">
         <div class="text-center mb-5" v-reveal>
@@ -110,6 +112,48 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- Bottom CTA: AI Study Advisor (English, with AI flair) -->
+    <section class="py-5 py-lg-6 position-relative bg-gradient" style="--bs-gradient: linear-gradient(180deg,#ffffff, #f8f9ff); overflow:hidden;">
+      <div class="container">
+        <div class="row align-items-center gy-4">
+          <div class="col-lg-6" v-reveal>
+            <span class="badge bg-primary-subtle text-primary mb-2 shadow-sm">AI Study Advisor • Shaheed</span>
+            <h2 class="fw-bold mb-2">Not sure where to start?</h2>
+            <p class="text-muted mb-2">Meet <strong>Shaheed</strong>, your AI study assistant. Answer a few quick questions and get a personalized study plan tailored to your grade and subjects in Egypt.</p>
+            <ul class="text-muted small mb-4">
+              <li>Weekly plan with realistic daily tasks</li>
+              <li>Resource recommendations (videos, practice, notes)</li>
+              <li>Actionable tips to stay consistent</li>
+            </ul>
+            <RouterLink :to="{ name: 'chat' }" class="btn btn-primary btn-lg px-4 btn-shine">
+              <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Start with Shaheed
+            </RouterLink>
+          </div>
+          <div class="col-lg-6" v-reveal>
+            <div class="ratio ratio-4x3 rounded-4 shadow overflow-hidden bg-white position-relative ai-card" data-parallax data-speed="0.12">
+              <img src="/images/حيران .jpg" alt="Confused student" class="w-100 h-100 animate-float" style="object-fit: cover;" />
+              <div class="position-absolute top-0 start-0 w-100 h-100" style="background: radial-gradient(circle at 80% 20%, rgba(13,110,253,.06), transparent 50%);"></div>
+              <!-- floating chat chip from Shaheed -->
+              <div class="position-absolute top-0 start-0 m-3">
+                <div class="bg-white shadow-sm rounded-pill px-3 py-2 d-flex align-items-center gap-2 animate-float" style="animation-duration:6s;">
+                  <span class="badge bg-primary">Shaheed</span>
+                  <span class="small text-muted">Let’s craft your plan!</span>
+                </div>
+              </div>
+              <!-- subtle glow ring -->
+              <div class="position-absolute rounded-circle" style="right:-40px; bottom:-40px; width:160px; height:160px; background: radial-gradient(closest-side, rgba(13,110,253,.25), transparent 70%); filter: blur(2px);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- decorative blobs -->
+      <div class="blob blob-primary animate-float" style="width:160px;height:160px; left:-50px; bottom:20px; opacity:.7;" data-parallax data-speed="0.22"></div>
+      <div class="blob blob-accent animate-wobble" style="width:120px;height:120px; right:-30px; top:10px; opacity:.8;" data-parallax data-speed="0.2"></div>
+      <!-- sparkles -->
+      <i class="fa-solid fa-star text-primary position-absolute animate-float" style="left:20%; top:10%; opacity:.5"></i>
+      <i class="fa-solid fa-wand-magic-sparkles text-warning position-absolute animate-float" style="left:25%; top:18%; opacity:.4; animation-duration:7s;"></i>
     </section>
 
     <Footer />

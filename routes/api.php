@@ -13,6 +13,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\StatsController;
+use App\Http\Controllers\AIController;
 use Illuminate\Support\Facades\DB;
 
 Route::post('/register', [RegisterController::class, 'register']);
@@ -117,6 +118,18 @@ Route::middleware(['auth:sanctum', 'isAdmin'])->prefix('admin')->group(function 
             ->get();
         return response()->json($logs);
     });
+});
+
+// AI Study Advisor (public)
+Route::post('/ai/study-plan', [AIController::class, 'studyPlan']);
+// AI Chat (public)
+Route::post('/ai/chat', [AIController::class, 'chat']);
+
+// AI Conversations (auth required)
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/ai/conversations', [AIController::class, 'conversations']);
+    Route::post('/ai/conversations', [AIController::class, 'createConversation']);
+    Route::get('/ai/conversations/{id}', [AIController::class, 'showConversation']);
 });
 
 // Public subjects endpoints

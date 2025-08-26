@@ -21,6 +21,8 @@ import AdminBooks from '../components/pages/admin/Books.vue'
 import ProfilePage from '../components/pages/Profile.vue'
 import AdminUserProfile from '../components/pages/admin/UserProfile.vue'
 import SubjectsPage from '../components/pages/Subjects.vue'
+import AdvisorPage from '../components/pages/Advisor.vue'
+import ChatPage from '../components/pages/Chat.vue'
 
 export const routes = [
   { path: '/', name: 'home', component: LandingPage },
@@ -33,6 +35,8 @@ export const routes = [
   { path: '/profile', name: 'profile', component: ProfilePage, meta: { requiresAuth: true } },
   { path: '/subjects', name: 'subjects', component: SubjectsPage },
   { path: '/subjects/:subject', name: 'subject', component: SubjectPage, props: true },
+  { path: '/advisor', name: 'advisor', component: AdvisorPage },
+  { path: '/chat', name: 'chat', component: ChatPage },
   // Admin area under shared layout
   {
     path: '/admin',
