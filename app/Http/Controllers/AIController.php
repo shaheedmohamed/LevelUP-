@@ -63,7 +63,7 @@ class AIController extends Controller
                 'plan_detail' => 'Weekly plan with daily breakdown for 2-4 weeks. Tailored to Egyptian curriculum.',
                 'resources' => 'List Arabic-first resources (YouTube channels, sites, books, platforms).',
                 'tips' => 'Actionable tips for consistency, revision, and exam prep.',
-                'format' => 'Return in markdown with clear headings and bullet points.'
+                'format' => 'Return in markdown with clear headings and bullet points. Additionally, include a machine-readable JSON schedule in a fenced code block marked as json at the end. The JSON should follow this shape: { "title": string, "weeks": [ { "week": number, "days": [ { "day": string, "items": [ { "subject": string, "task": string, "duration_minutes": number, "resource": string } ] } ], "tips": [string] } ] }. Ensure the JSON is valid and parsable.'
             ]
         ];
 

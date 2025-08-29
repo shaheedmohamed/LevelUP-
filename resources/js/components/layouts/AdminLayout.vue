@@ -45,6 +45,10 @@
         <div class="header-actions">
           <span class="lang">EN ▾</span>
           <button class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+          <RouterLink :to="{ name: 'messages' }" class="icon-btn position-relative" title="Messages">
+            <i class="fa-regular fa-message"></i>
+            <span v-if="store.state.unreadCount>0" class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">{{ store.state.unreadCount }}</span>
+          </RouterLink>
           <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
           <div class="avatar initials" :title="userName">{{ initials }}</div>
         </div>
@@ -58,9 +62,10 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import auth from '../../store/auth'
+import store from '../../store/messages'
 
 export default {
   name: 'AdminLayout',
@@ -75,7 +80,13 @@ export default {
       return letters.slice(0,2).toUpperCase()
     })
     const routeName = computed(() => route.name)
-    return { userName, initials, routeName }
+    let unreadTimer = null
+    onMounted(() => {
+      store.refreshUnread()
+      unreadTimer = setInterval(() => store.refreshUnread(), 10000)
+    })
+    onBeforeUnmount(() => { if (unreadTimer) clearInterval(unreadTimer) })
+    return { userName, initials, routeName, store }
   }
 }
 </script>

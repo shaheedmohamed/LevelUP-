@@ -14,7 +14,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\StatsController;
 use App\Http\Controllers\AIController;
+use App\Http\Controllers\ParentController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ReviewController;
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
@@ -28,6 +31,13 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::post('/profile', [ProfileController::class, 'update']);
+});
+
+// Parent (guardian) routes
+Route::middleware('auth:sanctum')->prefix('parent')->group(function(){
+    Route::get('/children', [ParentController::class, 'children']);
+    Route::post('/children', [ParentController::class, 'addChild']);
+    Route::delete('/children/{id}', [ParentController::class, 'removeChild']);
 });
 
 // Admin routes
@@ -130,6 +140,19 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/ai/conversations', [AIController::class, 'conversations']);
     Route::post('/ai/conversations', [AIController::class, 'createConversation']);
     Route::get('/ai/conversations/{id}', [AIController::class, 'showConversation']);
+
+    // User messaging
+    Route::get('/messages/conversations', [MessageController::class, 'conversations']);
+    Route::post('/messages/start', [MessageController::class, 'start']);
+    Route::post('/messages/start-admin', [MessageController::class, 'startAdmin']);
+    Route::get('/messages/conversations/{id}', [MessageController::class, 'show']);
+    Route::post('/messages/conversations/{id}/send', [MessageController::class, 'send']);
+    Route::post('/messages/conversations/{id}/read', [MessageController::class, 'markRead']);
+    Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
+
+    // Spaced repetition (reviews)
+    Route::get('/reviews/next', [ReviewController::class, 'next']);
+    Route::post('/reviews/schedule', [ReviewController::class, 'schedule']);
 });
 
 // Public subjects endpoints

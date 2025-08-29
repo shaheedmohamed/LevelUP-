@@ -34,6 +34,7 @@
               <td class="d-flex gap-2">
                 <RouterLink class="btn btn-sm btn-outline-primary" :to="{ name:'admin-user-profile', params: { id: u.id } }">👁 View Profile</RouterLink>
                 <RouterLink class="btn btn-sm btn-outline-secondary" :to="{ name:'admin-user-profile', params: { id: u.id }, query: { tab: 'history' } }">🕓 History</RouterLink>
+                <button class="btn btn-sm btn-success" :disabled="u.id === meId" :title="u.id===meId ? 'You cannot message yourself' : 'Start chat'" @click="messageUser(u.id)">💬 Message</button>
               </td>
             </tr>
           </tbody>
@@ -45,21 +46,37 @@
 
 <script>
 import axios from 'axios'
+import messages from '../../../store/messages'
+import { useRouter } from 'vue-router'
+import { reactive, toRefs } from 'vue'
+import auth from '../../../store/auth'
 
 export default {
   name: 'AdminUsersPage',
-  data() {
-    return { users: [], loading: true, error: null }
-  },
-  async mounted() {
-    try {
-      const { data } = await axios.get('/api/admin/users')
-      this.users = data
-    } catch (e) {
-      this.error = e?.response?.data?.message || e.message || 'Failed to load users'
-    } finally {
-      this.loading = false
+  setup(){
+    const router = useRouter()
+    const state = reactive({ users: [], loading: true, error: null })
+    const meId = auth.state.user?.id || null
+    const load = async () => {
+      try {
+        const { data } = await axios.get('/api/admin/users')
+        state.users = data
+      } catch (e) {
+        state.error = e?.response?.data?.message || e.message || 'Failed to load users'
+      } finally {
+        state.loading = false
+      }
     }
+    const messageUser = async (userId) => {
+      try {
+        // navigate with user param; Messages page will start/open and focus input
+        await router.push({ name: 'messages', query: { user: userId } })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    load()
+    return { ...toRefs(state), messageUser, meId }
   }
 }
 </script>

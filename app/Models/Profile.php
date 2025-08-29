@@ -11,10 +11,15 @@ class Profile extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'age', 'stage', 'address', 'phone', 'avatar'
+        'user_id', 'age', 'stage', 'address', 'phone', 'avatar',
+        'reminders_enabled', 'reminder_time'
     ];
 
     protected $appends = ['avatar_url'];
+
+    protected $casts = [
+        'reminders_enabled' => 'boolean',
+    ];
 
     public function user()
     {

@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Profile::class);
     }
+
+    public function children()
+    {
+        return $this->hasMany(Child::class, 'parent_id');
+    }
 }

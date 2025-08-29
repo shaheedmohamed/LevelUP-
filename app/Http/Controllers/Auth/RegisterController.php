@@ -17,17 +17,28 @@ class RegisterController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'phone' => ['nullable', 'string'],
-            'age' => ['required', 'integer', 'min:5', 'max:100'],
-            'education_stage' => ['required', 'in:Primary,Preparatory,Secondary'],
+            'age' => ['nullable', 'integer', 'min:5', 'max:100'],
+            'education_stage' => ['nullable', 'in:Primary,Preparatory,Secondary'],
+            'role' => ['nullable', 'in:user,parent,admin'],
         ]);
+
+        $role = $data['role'] ?? 'user';
+        // For regular student users, require age and education_stage
+        if ($role === 'user') {
+            $request->validate([
+                'age' => ['required', 'integer', 'min:5', 'max:100'],
+                'education_stage' => ['required', 'in:Primary,Preparatory,Secondary'],
+            ]);
+        }
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => $data['phone'] ?? null,
-            'age' => $data['age'],
-            'education_stage' => $data['education_stage'],
+            'age' => $data['age'] ?? null,
+            'education_stage' => $data['education_stage'] ?? null,
+            'role' => $role,
         ]);
 
         $token = $user->createToken('api')->plainTextToken;

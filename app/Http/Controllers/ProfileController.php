@@ -31,6 +31,8 @@ class ProfileController extends Controller
             'stage' => ['nullable','string','max:50'],
             'address' => ['nullable','string','max:255'],
             'phone' => ['nullable','string','max:50'],
+            'reminders_enabled' => ['sometimes','boolean'],
+            'reminder_time' => ['nullable','string','max:5'],
             'avatar' => ['nullable','file','image','max:5120'], // 5 MB
         ]);
 
@@ -39,7 +41,7 @@ class ProfileController extends Controller
         $user->save();
 
         // update profile fields
-        foreach (['age','stage','address','phone'] as $f) {
+        foreach (['age','stage','address','phone','reminders_enabled','reminder_time'] as $f) {
             if (array_key_exists($f, $data)) { $profile->{$f} = $data[$f]; }
         }
 

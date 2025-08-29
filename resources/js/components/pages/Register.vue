@@ -10,6 +10,17 @@
               <div v-if="success" class="alert alert-success" role="alert">{{ success }}</div>
               <form @submit.prevent="submit">
                 <div class="mb-3">
+                  <label class="form-label">I am registering as</label>
+                  <div class="d-flex gap-3">
+                    <label class="form-check">
+                      <input class="form-check-input" type="radio" value="user" v-model="form.role"> Student
+                    </label>
+                    <label class="form-check">
+                      <input class="form-check-input" type="radio" value="parent" v-model="form.role"> Parent / Guardian
+                    </label>
+                  </div>
+                </div>
+                <div class="mb-3">
                   <label class="form-label">Name</label>
                   <input v-model="form.name" type="text" class="form-control form-control-lg" placeholder="Your name" required>
                 </div>
@@ -21,13 +32,13 @@
                   <label class="form-label">Phone (optional)</label>
                   <input v-model="form.phone" type="text" class="form-control form-control-lg" placeholder="(+20) 1X XXX XXXX">
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" v-if="form.role==='user'">
                   <label class="form-label">Age</label>
-                  <input v-model.number="form.age" type="number" min="5" max="100" class="form-control form-control-lg" placeholder="Your age" required>
+                  <input v-model.number="form.age" type="number" min="5" max="100" class="form-control form-control-lg" placeholder="Your age">
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" v-if="form.role==='user'">
                   <label class="form-label">Education Stage</label>
-                  <select v-model="form.education_stage" class="form-select form-select-lg" required>
+                  <select v-model="form.education_stage" class="form-select form-select-lg">
                     <option value="" disabled>Select your stage</option>
                     <option value="Primary">Primary</option>
                     <option value="Preparatory">Preparatory</option>
@@ -65,7 +76,7 @@ export default {
   name: 'RegisterPage',
   components: { Footer },
   data(){
-    return { form: { name:'', email:'', phone:'', age:null, education_stage:'', password:'', password_confirmation:'' }, loading:false, error:'', success:'' }
+    return { form: { role:'user', name:'', email:'', phone:'', age:null, education_stage:'', password:'', password_confirmation:'' }, loading:false, error:'', success:'' }
   },
   methods:{
     async submit(){
@@ -77,7 +88,8 @@ export default {
         auth.setToken(data.token)
         auth.setUser(data.user)
         this.success = 'Account created successfully'
-        setTimeout(()=> this.$router.push({ name:'dashboard' }), 400)
+        const dest = (data.user?.role === 'parent') ? { name:'parent-dashboard' } : { name:'dashboard' }
+        setTimeout(()=> this.$router.push(dest), 400)
       }catch(err){
         this.error = err?.response?.data?.message
           || Object.values(err?.response?.data?.errors || {})[0]?.[0]

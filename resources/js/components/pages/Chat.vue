@@ -8,7 +8,7 @@
             <button class="btn btn-sm btn-outline-secondary d-lg-none" @click="showSidebar = !showSidebar">
               <i class="fa-solid fa-bars"></i>
             </button>
-            <span class="badge bg-primary">Shaheed</span>
+            <span class="badge bg-primary">lumix</span>
             <h1 class="h5 mb-0">Chat</h1>
           </div>
           <div class="d-flex align-items-center gap-2">
@@ -84,7 +84,7 @@ export default {
   name: 'ChatPage',
   setup(){
     const messages = ref([
-      { role: 'assistant', content: 'Hi, I\'m <b>Shaheed</b>! Ask me anything about your studies and I\'ll help.' }
+      { role: 'assistant', content: 'أهلاً! أنا <b>lumix</b> مساعدتك الذكية للدراسة. هساعدك تخططي/تخطط للدراسة بطريقتك وبأسلوب بسيط ومحترف. قولي/قلّي هدفك أو سؤالك وخلّينا نبدأ.' }
     ])
     const input = ref('')
     const loading = ref(false)
@@ -160,7 +160,7 @@ export default {
 
     const newChat = () => {
       activeConvId.value = null
-      messages.value = [ { role: 'assistant', content: 'New chat started. How can I help?' } ]
+      messages.value = [ { role: 'assistant', content: 'بدأنا محادثة جديدة. أقدر أساعدك في إيه؟' } ]
       input.value = ''
       error.value = ''
     }

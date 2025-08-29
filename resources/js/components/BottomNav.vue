@@ -10,7 +10,7 @@
     </RouterLink>
     <RouterLink class="bn-item main" :to="{ name: 'chat' }" :class="isActive('chat')">
       <i class="fa-solid fa-wand-magic-sparkles"></i>
-      <span>Shaheed</span>
+      <span>lumix</span>
     </RouterLink>
     <RouterLink class="bn-item" :to="{ name: 'subjects' }" :class="isActive('subjects')">
       <i class="fa-solid fa-book-open"></i>
@@ -34,7 +34,11 @@ export default {
   setup(){
     const route = useRoute()
     const isActive = (name) => ({ active: route.name === name })
-    const accountRoute = computed(() => auth.isAuthenticated() ? { name: 'dashboard' } : { name: 'login' })
+    const accountRoute = computed(() => {
+      if (!auth.isAuthenticated()) return { name: 'login' }
+      const role = auth.state.user?.role
+      return role === 'parent' ? { name: 'parent-dashboard' } : { name: 'dashboard' }
+    })
     return { isActive, accountRoute }
   }
 }

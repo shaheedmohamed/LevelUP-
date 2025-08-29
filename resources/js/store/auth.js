@@ -51,3 +51,10 @@ async function logout() {
 }
 
 export default { state, setToken, setUser, loadFromLocalStorage, isAuthenticated, fetchUser, logout }
+ 
+// Add helper to patch user locally and persist
+export function patchUser(patch){
+  const next = { ...(state.user || {}), ...patch }
+  setUser(next)
+  return next
+}

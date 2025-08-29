@@ -9,7 +9,7 @@
       <div class="container d-flex align-items-center justify-content-between">
         <!-- Brand -->
         <RouterLink class="brand d-flex align-items-center text-decoration-none" :to="{ name: 'home' }" @click="closeMenu">
-          <img src="/images/logo-smartpath.png" alt="Smart Path Logo" class="brand-logo me-2" />
+          <i class="fa-solid fa-graduation-cap fs-4 me-2"></i>
           <span class="fw-bold">Smart Path</span>
         </RouterLink>
 
@@ -41,8 +41,12 @@
               <RouterLink class="btn btn-primary" :to="{ name: 'register' }" @click="closeMenu">Register</RouterLink>
             </template>
             <template v-else>
-              <RouterLink class="btn btn-outline-primary me-2" :to="{ name: 'dashboard' }" @click="closeMenu">
-                <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+              <RouterLink class="btn btn-outline-primary me-2" :to="dashboardRoute" @click="closeMenu">
+                <i class="fa-solid fa-gauge-high me-2"></i>{{ dashboardLabel }}
+              </RouterLink>
+              <RouterLink class="btn btn-light position-relative me-2" :to="{ name: 'messages' }" @click="closeMenu" title="Messages">
+                <i class="fa-regular fa-message"></i>
+                <span v-if="store.state.unreadCount>0" class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">{{ store.state.unreadCount }}</span>
               </RouterLink>
               <div class="dropdown" ref="dropdownWrap">
                 <button class="btn btn-light d-flex align-items-center" @click="toggleDropdown" :aria-expanded="dropdown ? 'true' : 'false'" aria-haspopup="menu">
@@ -51,7 +55,7 @@
                 </button>
                 <div class="dropdown-menu end" v-if="dropdown" role="menu">
                   <RouterLink class="dropdown-item" :to="{ name: 'profile' }" @click="closeMenu"><i class="fa-regular fa-id-badge me-2"></i>Profile</RouterLink>
-                  <RouterLink class="dropdown-item" :to="{ name: 'advisor' }" @click="closeMenu"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Create plan with Shaheed</RouterLink>
+                  <RouterLink class="dropdown-item" :to="{ name: 'advisor' }" @click="closeMenu"><i class="fa-solid fa-wand-magic-sparkles me-2"></i>Create plan with lumix</RouterLink>
                   <button class="dropdown-item" @click="handleLogout"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button>
                 </div>
               </div>
@@ -68,6 +72,7 @@
 <script>
 import { onMounted, onBeforeUnmount, ref, computed } from 'vue'
 import auth from '../../store/auth'
+import store from '../../store/messages'
 
 export default {
   name: 'NavbarLayout',
@@ -83,6 +88,9 @@ export default {
       const u = auth.state.user || {}
       return !!(u.is_admin || u.isAdmin || u.role === 'admin' || u.role === 'superadmin')
     })
+    const isParentUser = computed(() => (auth.state.user?.role === 'parent'))
+    const dashboardRoute = computed(() => isParentUser.value ? { name: 'parent-dashboard' } : { name: 'dashboard' })
+    const dashboardLabel = computed(() => isParentUser.value ? 'Parent Dashboard' : 'Dashboard')
 
     const toggleMenu = () => { isOpen.value = !isOpen.value }
     const closeMenu = () => { isOpen.value = false; dropdown.value = false }
@@ -101,17 +109,22 @@ export default {
       if (el && !el.contains(e.target)) dropdown.value = false
     }
 
+    let unreadTimer = null
     onMounted(() => {
       onScroll()
       window.addEventListener('scroll', onScroll, { passive: true })
       document.addEventListener('click', onClickOutside, { passive: true })
+      // messages unread polling
+      store.refreshUnread()
+      unreadTimer = setInterval(() => store.refreshUnread(), 10000)
     })
     onBeforeUnmount(() => {
       window.removeEventListener('scroll', onScroll)
       document.removeEventListener('click', onClickOutside)
+      if (unreadTimer) clearInterval(unreadTimer)
     })
 
-    return { isOpen, dropdown, isScrolled, isAuthed, userName, isAdminUser, toggleMenu, closeMenu, handleLogout, toggleDropdown, dropdownWrap }
+    return { isOpen, dropdown, isScrolled, isAuthed, userName, isAdminUser, isParentUser, dashboardRoute, dashboardLabel, toggleMenu, closeMenu, handleLogout, toggleDropdown, dropdownWrap, store }
   }
 }
 </script>
